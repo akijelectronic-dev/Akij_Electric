@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AKIJ Electric Portal - Live</title>
+
+<!-- Firebase SDK যোগ করা হচ্ছে -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<style>
+/* ========== রুট ভেরিয়েবল ========== */
+:root {
+  --primary: #0f172a;
+  --secondary: #ff7a00;
+  --bg: #eef2f7;
+  --card: #ffffff;
+  --text: #222;
+  --shadow: 0 10px 30px rgba(0,0,0,0.15);
+  --radius: 12px;
+}
+
+/* ========== ডার্ক মোড ========== */
+.dark-mode {
+  --bg: #1a1a2e;
+  --card: #2a2a4a;
+  --text: #f0f0f0;
+  --shadow: 0 10px 30px rgba(255,255,255,0.05);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ========== লোডিং ========== */
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  color: #fff;
+  font-size: 20px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #fff;
+  border-top-color: #ff7a00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========== LOGIN পেজ ========== */
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #ff7a00);
+}
+
+.login-box {
+  width: 360px;
+  max-width: 90%;
+  background: var(--card);
+  padding: 30px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.logo-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0f172a, #ff7a00);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #fff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.login-box h2 {
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  background: var(--card);
+  color: var(--text);
+  font-size: 14px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.2);
+}
+
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+.login-btn {
+  width: 100%;
+  background: var(--secondary);
+  color: #fff;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background: #e06d00;
+}
+
+/* ========== PORTAL ========== */
+.portal {
+  display: none;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* ========== HEADER ========== */
+header {
+  background: linear-gradient(135deg, #0f172a, #ff7a00);
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+header h3 {
+  font-size: 20px;
+}
+
+#timeDisplay {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.header-btn {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.3);
+  font-size: 14px;
+}
+
+.header-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.online-status {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: #4caf50;
+  color: #fff;
+}
+
+/* ========== WELCOME ========== */
+.welcome {
+  margin: 15px;
+  background: var(--card);
+  padding: 20px;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.welcome h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--secondary);
+}
+
+.welcome h3 {
+  font-size: 18px;
+}
+
+/* ========== MENU ========== */
+.menu {
+  display: flex;
+  gap: 10px;
+  padding: 0 15px 15px;
+  flex-wrap: wrap;
+}
+
+.menu button {
+  flex: 1;
+  min-width: 120px;
+  background: var(--primary);
+  color: #fff;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: var(--radius);
+}
+
+.menu button:hover {
+  background: #1a2a4a;
+}
+
+.menu button.active {
+  background: var(--secondary);
+}
+
+/* ========== SECTION ========== */
+.section {
+  display: none;
+  padding: 0 15px 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+.section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: var(--primary);
+}
+
+/* ========== ITEM কার্ড ========== */
+.item {
+  background: var(--card);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--secondary);
+}
+
+.item b {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.item p {
+  margin: 8px 0;
+  font-weight: bold;
+}
+
+.item .input-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.item input {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px;
+  margin: 0;
+}
+
+.item button {
+  background: var(--secondary);
+  color: #fff;
+  padding: 8px 16px;
+}
+
+.item button:hover {
+  background: #e06d00;
+}
+
+/* ========== CONTACT & ABOUT ========== */
+#contact p, #about p {
+  background: var(--card);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 5px 0;
+  box-shadow: var(--shadow);
+}
+
+/* ========== HISTORY ========== */
+#history .item {
+  border-left-color: #2196F3;
+}
+
+/* ========== ADMIN PANEL ========== */
+#adminPanel {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+#adminPanel > div {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #1a1a2e;
+  padding: 25px;
+  border-radius: var(--radius);
+}
+
+.close-btn {
+  background: #ff4444;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.close-btn:hover {
+  background: #cc0000;
+}
+
+.admin-section {
+  background: #2a2a4a;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: var(--radius);
+}
+
+.admin-section h3 {
+  color: var(--secondary);
+  margin-bottom: 10px;
+}
+
+.admin-section input, .admin-section select {
+  background: #1a1a2e;
+  color: #fff;
+  border-color: #444;
+}
+
+.admin-section button {
+  background: var(--secondary);
+  color: #fff;
+  padding: 8px 16px;
+  margin: 5px;
+}
+
+.admin-section button:hover {
+  background: #e06d00;
+}
+
+.admin-box {
+  background: #1a1a2e;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border-left: 3px solid var(--secondary);
+}
+
+.admin-box button {
+  background: #444;
+  color: #fff;
+  padding: 5px 12px;
+  margin: 3px;
+  font-size: 12px;
+}
+
+.admin-box button:hover {
+  background: #666;
+}
+
+.admin-box .delete-btn {
+  background: #ff4444;
+}
+
+.admin-box .delete-btn:hover {
+  background: #cc0000;
+}
+
+.admin-box .edit-btn {
+  background: #2196F3;
+}
+
+.admin-box .edit-btn:hover {
+  background: #1976D2;
+}
+
+/* ========== FOOTER ========== */
+footer {
+  text-align: center;
+  padding: 20px;
+  font-weight: bold;
+  background: var(--card);
+  margin-top: 20px;
+  border-top: 2px solid var(--secondary);
+  color: var(--text);
+}
+
+/* ========== রেসপনসিভ ========== */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .menu button {
+    min-width: 80px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .item .input-group {
+    flex-direction: column;
+  }
+  
+  .item input {
+    width: 100%;
+  }
+  
+  #adminPanel > div {
+    padding: 15px;
+  }
+  
+  .login-box {
+    padding: 20px;
+  }
+}
+
+/* ========== স্ক্রলবার ========== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e06d00;
+}
+
+/* ========== লাইভ ইন্ডিকেটর ========== */
+.live-badge {
+  background: #ff4444;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ========== লাস্ট আপডেটেড ========== */
+.last-updated {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  margin: 5px 0;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ====== লোডিং ====== -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div>🔄 Connecting to server...</div>
+  <div style="font-size:14px;color:#aaa;">Please wait</div>
+</div>
+
+<!-- ====== LOGIN পেজ ====== -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <div class="logo">
+      <div class="logo-circle">⚡</div>
+    </div>
+    <h2>AKIJ Electric</h2>
+    <p style="text-align:center;color:#888;margin-bottom:15px;">Live Inventory System</p>
+    
+    <input id="username" placeholder="Username" autofocus>
+    <input id="password" type="password" placeholder="Password" onkeypress="if(event.key==='Enter') login()">
+    
+    <button class="login-btn" onclick="login()">🔐 Login</button>
+    
+    <p style="text-align:center;margin-top:15px;font-size:12px;color:#888;">Default: akij / 7070</p>
+  </div>
+</div>
+
+<!-- ====== PORTAL ====== -->
+<div class="portal" id="portal">
+
+  <!-- HEADER -->
+  <header>
+    <div>
+      <h3>⚡ AKIJ Electric Portal <span class="live-badge">LIVE</span></h3>
+      <div id="timeDisplay">Loading...</div>
+    </div>
+    <div class="header-buttons">
+      <span class="online-status" id="onlineStatus">🟢 Online</span>
+      <button class="header-btn" onclick="toggleAdmin()">👤 Admin</button>
+      <button class="header-btn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+  </header>
+
+  <!-- WELCOME -->
+  <div class="welcome">
+    <h2 id="slideText">Welcome To AKIJ Electric Portal</h2>
+    <h3>📦 Total Stock: <span id="totalStock">0</span></h3>
+    <div class="last-updated" id="lastUpdated">Last updated: Just now</div>
+  </div>
+
+  <!-- MENU -->
+  <div class="menu">
+    <button class="active" data-page="items" onclick="showPage('items')">📋 Items</button>
+    <button data-page="contact" onclick="showPage('contact')">📞 Emergency</button>
+    <button data-page="about" onclick="showPage('about')">ℹ️ About</button>
+    <button data-page="history" onclick="showPage('history')">📜 Issue History</button>
+  </div>
+
+  <!-- ====== ITEMS ====== -->
+  <div id="items" class="section active"></div>
+
+  <!-- ====== CONTACT ====== -->
+  <div id="contact" class="section">
+    <h3>📞 Emergency Contact</h3>
+    <p>👤 Name: Md Al-Amin</p>
+    <p>📱 Phone: 01859137381</p>
+    <p>📧 Email: alamin.garena3@gmail.com</p>
+    <p style="margin-top:15px;background:#fff3cd;padding:12px;border-radius:8px;border-left:4px solid #ffc107;">
+      ⚠️ For urgent technical support, please call during office hours.
+    </p>
+  </div>
+
+  <!-- ====== ABOUT ====== -->
+  <div id="about" class="section">
+    <h3>ℹ️ About</h3>
+    <p>🏢 AKIJ Electric Inventory Management System</p>
+    <p>📌 Version: 3.0 (Live)</p>
+    <p>👨‍💻 Developer: Md Al-Amin</p>
+    <p>📅 Last Updated: January 2024</p>
+    <p style="margin-top:15px;">🔴 <b>This is a LIVE system</b> - all users see the same data in real-time!</p>
+  </div>
+
+  <!-- ====== HISTORY ====== -->
+  <div id="history" class="section">
+    <h3>📜 Issue History</h3>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ====== ADMIN PANEL ====== -->
+  <div id="adminPanel">
+    <div>
+      <button class="close-btn" onclick="toggleAdmin()">✖ Close Admin Panel</button>
+      
+      <h2 style="color:#ff7a00;margin-bottom:20px;">🔧 Admin Panel</h2>
+      
+      <!-- Add Item -->
+      <div class="admin-section">
+        <h3>➕ Add New Item</h3>
+        <input id="newItemName" placeholder="Item Name (e.g., Motor 24V)">
+        <input id="newItemCode" placeholder="Item Code (e.g., M003)" style="margin-top:8px;">
+        <button onclick="addItem()" style="margin-top:8px;">Add Item</button>
+      </div>
+      
+      <!-- Bulk Stock -->
+      <div class="admin-section">
+        <h3>📦 Bulk Stock Add</h3>
+        <select id="bulkItemSelect"></select>
+        <input id="bulkQty" type="number" placeholder="Quantity" style="margin-top:8px;">
+        <button onclick="bulkAdd()" style="margin-top:8px;">Add Stock</button>
+      </div>
+      
+      <!-- Stock Control -->
+      <div class="admin-section">
+        <h3>📊 Stock Control</h3>
+        <div id="adminList"></div>
+      </div>
+      
+      <!-- Issue Manager -->
+      <div class="admin-section">
+        <h3>🗑️ Issue Manager</h3>
+        <div id="issueManager"></div>
+      </div>
+      
+      <!-- Danger Zone -->
+      <div class="admin-section" style="border:2px solid #ff4444;">
+        <h3 style="color:#ff4444;">⚠️ Danger Zone</h3>
+        <button onclick="resetAllData()" style="background:#ff4444;">🗑️ Reset All Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>⚡ Developed by Md Al-Amin | AKIJ Electric © 2024 | 🔴 Live System</footer>
+</div>
+
+<!-- ====== JAVASCRIPT ====== -->
+<script>
+// ========== FIREBASE CONFIGURATION ==========
+// 🔑 আপনার নিজের Firebase Config এখানে বসান
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAzudoI09Oy3UFsdlNdF7GaV2A-LNPgqsU",
+  authDomain: "akij-electric.firebaseapp.com",
+  databaseURL: "https://akij-electric-default-rtdb.firebaseio.com",
+  projectId: "akij-electric",
+  storageBucket: "akij-electric.firebasestorage.app",
+  messagingSenderId: "356900487488",
+  appId: "1:356900487488:web:5eb62bc914f4b496b9faa5",
+  measurementId: "G-GL1BCD3TEB"
+};
+
+// ⚠️ উপরের Config আপনার নিজের Firebase প্রজেক্ট থেকে নিতে হবে!
+// Firebase Console → Project Settings → Your apps → Config
+
+// ========== FIREBASE INIT ==========
+let db;
+let isFirebaseReady = false;
+let currentUser = '';
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  isFirebaseReady = true;
+  console.log('✅ Firebase connected!');
+} catch (e) {
+  console.error('❌ Firebase error:', e);
+  alert('⚠️ Firebase connection failed! Please check your config.');
+}
+
+// ========== DOM রেফারেন্স ==========
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loginPage = document.getElementById('loginPage');
+const portal = document.getElementById('portal');
+const username = document.getElementById('username');
+const password = document.getElementById('password');
+const timeDisplay = document.getElementById('timeDisplay');
+const slideText = document.getElementById('slideText');
+const totalStock = document.getElementById('totalStock');
+const itemsContainer = document.getElementById('items');
+const historyList = document.getElementById('historyList');
+const adminPanel = document.getElementById('adminPanel');
+const bulkItemSelect = document.getElementById('bulkItemSelect');
+const adminList = document.getElementById('adminList');
+const issueManager = document.getElementById('issueManager');
+const onlineStatus = document.getElementById('onlineStatus');
+const lastUpdated = document.getElementById('lastUpdated');
+
+// ========== ডিফল্ট ডেটা ==========
+const DEFAULT_ITEMS = [
+  {code: 'M001', name: 'Motor 6v'},
+  {code: 'M002', name: 'Motor 12v'},
+  {code: 'B001', name: 'Battery 6V'},
+  {code: 'BS16', name: 'Blade Stand 16'}
+];
+
+let items = [];
+let issues = [];
+let stockData = {};
+
+// ========== ফায়ারবেস থেকে ডেটা লোড ==========
+function loadFromFirebase() {
+  if (!isFirebaseReady) {
+    loadingOverlay.style.display = 'none';
+    return;
+  }
+  
+  // Items লোড
+  db.ref('items').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val) {
+      items = val;
+    } else {
+      // প্রথমবার ডেটা না থাকলে ডিফল্ট সেট করি
+      items = DEFAULT_ITEMS;
+      db.ref('items').set(items);
+    }
+    renderItems();
+    loadBulkSelect();
+    renderAdmin();
+    updateTotal();
+    hideLoading();
+    updateOnlineStatus(true);
+    updateLastUpdated();
+  }, (error) => {
+    console.error('Items load error:', error);
+    updateOnlineStatus(false);
+  });
+  
+  // Stock Data লোড
+  db.ref('stock').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val) {
+      stockData = val;
+    } else {
+      stockData = {};
+      db.ref('stock').set(stockData);
+    }
+    renderItems();
+    renderAdmin();
+    updateTotal();
+    hideLoading();
+    updateOnlineStatus(true);
+    updateLastUpdated();
+  }, (error) => {
+    console.error('Stock load error:', error);
+    updateOnlineStatus(false);
+  });
+  
+  // Issues লোড
+  db.ref('issues').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val) {
+      issues = val;
+    } else {
+      issues = [];
+      db.ref('issues').set(issues);
+    }
+    renderHistory();
+    renderIssueManager();
+    hideLoading();
+    updateOnlineStatus(true);
+  }, (error) => {
+    console.error('Issues load error:', error);
+    updateOnlineStatus(false);
+  });
+}
+
+// ========== লোডিং হাইড ==========
+function hideLoading() {
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'none';
+  }
+}
+
+// ========== অনলাইন স্ট্যাটাস ==========
+function updateOnlineStatus(isOnline) {
+  if (onlineStatus) {
+    onlineStatus.textContent = isOnline ? '🟢 Online' : '🔴 Offline';
+    onlineStatus.style.background = isOnline ? '#4caf50' : '#ff4444';
+  }
+}
+
+// ========== লাস্ট আপডেটেড ==========
+function updateLastUpdated() {
+  if (lastUpdated) {
+    const now = new Date().toLocaleString('bn-BD');
+    lastUpdated.textContent = `Last updated: ${now}`;
+  }
+}
+
+// ========== লগইন ==========
+function login() {
+  const user = username.value.trim();
+  const pass = password.value.trim();
+  
+  if (user === 'akij' && pass === '7070') {
+    currentUser = user;
+    loginPage.style.display = 'none';
+    portal.style.display = 'block';
+    loadFromFirebase();
+    startClock();
+    startSlider();
+  } else {
+    alert('❌ Wrong username or password!\n\nDefault: akij / 7070');
+    password.value = '';
+    password.focus();
+  }
+}
+
+// ========== ঘড়ি ==========
+function startClock() {
+  timeDisplay.textContent = new Date().toLocaleString('bn-BD', { 
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
+  setInterval(() => {
+    timeDisplay.textContent = new Date().toLocaleString('bn-BD', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+  }, 1000);
+}
+
+// ========== স্লাইডার ==========
+const slides = [
+  '⚡ Welcome To AKIJ Electric Portal',
+  '📦 Live Inventory System',
+  '👨‍💻 Developed By Al-Amin',
+  '🌍 Everyone sees the same data!'
+];
+let slideIndex = 0;
+
+function startSlider() {
+  slideText.textContent = slides[0];
+  setInterval(() => {
+    slideIndex = (slideIndex + 1) % slides.length;
+    slideText.textContent = slides[slideIndex];
+  }, 2500);
+}
+
+// ========== পেজ শো ==========
+function showPage(pageId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  
+  document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.menu button[data-page="${pageId}"]`)?.classList.add('active');
+}
+
+// ========== টোটাল আপডেট ==========
+function updateTotal() {
+  let total = 0;
+  if (items && items.length > 0) {
+    items.forEach(item => {
+      total += Number(stockData[item.code] || 0);
+    });
+  }
+  totalStock.textContent = total;
+}
+
+// ========== রেন্ডার আইটেম ==========
+function renderItems() {
+  if (!itemsContainer) return;
+  itemsContainer.innerHTML = '';
+  
+  if (!items || items.length === 0) {
+    itemsContainer.innerHTML = '<p style="text-align:center;padding:20px;color:#888;">No items found. Add from Admin panel.</p>';
+    return;
+  }
+  
+  items.forEach(item => {
+    const stock = Number(stockData[item.code] || 0);
+    
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = `item_${item.code}`;
+    div.innerHTML = `
+      <b>${item.code} | ${item.name}</b>
+      <p>📊 Stock: <span id="stock_${item.code}">${stock}</span></p>
+      <div class="input-group">
+        <input id="name_${item.code}" placeholder="Recipient Name" value="">
+        <input id="issue_${item.code}" type="number" placeholder="Qty" min="1" value="1">
+        <button onclick="issueItem('${item.code}')">📤 Issue</button>
+      </div>
+    `;
+    itemsContainer.appendChild(div);
+  });
+  
+  updateTotal();
+}
+
+// ========== রেন্ডার হিস্ট্রি ==========
+function renderHistory() {
+  if (!historyList) return;
+  historyList.innerHTML = '';
+  
+  if (!issues || issues.length === 0) {
+    historyList.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">No issues recorded yet.</p>';
+    return;
+  }
+  
+  const reversed = [...issues].reverse();
+  reversed.forEach(x => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.style.borderLeftColor = '#2196F3';
+    div.innerHTML = `
+      <div style="font-size:12px;color:#888;">${x.date}</div>
+      <b>👤 ${x.name}</b>
+      <p>${x.item} - Quantity: ${x.qty}</p>
+    `;
+    historyList.appendChild(div);
+  });
+}
+
+// ========== লোড বাল্ক সিলেক্ট ==========
+function loadBulkSelect() {
+  if (!bulkItemSelect) return;
+  bulkItemSelect.innerHTML = '';
+  if (items && items.length > 0) {
+    items.forEach(i => {
+      const opt = document.createElement('option');
+      opt.value = i.code;
+      opt.textContent = `${i.code} | ${i.name}`;
+      bulkItemSelect.appendChild(opt);
+    });
+  }
+}
+
+// ========== রেন্ডার অ্যাডমিন ==========
+function renderAdmin() {
+  if (!adminList) return;
+  adminList.innerHTML = '';
+  
+  if (!items || items.length === 0) {
+    adminList.innerHTML = '<p style="color:#888;">No items to show.</p>';
+    return;
+  }
+  
+  items.forEach((item, index) => {
+    const stock = Number(stockData[item.code] || 0);
+    
+    const div = document.createElement('div');
+    div.className = 'admin-box';
+    div.innerHTML = `
+      <b>${item.code} | ${item.name}</b><br>
+      📦 Stock: ${stock}
+      <div style="margin-top:8px;">
+        <button onclick="changeStock('${item.code}', 1)">➕ +1</button>
+        <button onclick="changeStock('${item.code}', -1)">➖ -1</button>
+        <button onclick="changeStock('${item.code}', 5)">➕ +5</button>
+        <button onclick="changeStock('${item.code}', 10)">➕ +10</button>
+        <button class="edit-btn" onclick="editItem(${index})">✏️ Edit</button>
+        <button class="delete-btn" onclick="deleteItem(${index})">🗑️ Delete</button>
+      </div>
+    `;
+    adminList.appendChild(div);
+  });
+}
+
+// ========== রেন্ডার ইস্যু ম্যানেজার ==========
+function renderIssueManager() {
+  if (!issueManager) return;
+  issueManager.innerHTML = '';
+  
+  if (!issues || issues.length === 0) {
+    issueManager.innerHTML = '<p style="color:#888;">No issues recorded.</p>';
+    return;
+  }
+  
+  const reversed = [...issues].reverse();
+  reversed.forEach((x, index) => {
+    const realIndex = issues.length - 1 - index;
+    const div = document.createElement('div');
+    div.className = 'admin-box';
+    div.innerHTML = `
+      <b>👤 ${x.name}</b><br>
+      ${x.item} - Qty: ${x.qty}<br>
+      <span style="font-size:12px;color:#888;">${x.date}</span>
+      <div style="margin-top:8px;">
+        <button class="delete-btn" onclick="deleteIssue(${realIndex})">🗑️ Delete</button>
+      </div>
+    `;
+    issueManager.appendChild(div);
+  });
+}
+
+// ========== ফায়ারবেসে ডেটা সেভ ==========
+function saveToFirebase(path, data) {
+  if (!isFirebaseReady) {
+    alert('⚠️ Not connected to server. Please refresh.');
+    return false;
+  }
+  try {
+    db.ref(path).set(data);
+    updateLastUpdated();
+    return true;
+  } catch (e) {
+    console.error('Save error:', e);
+    alert('❌ Failed to save data. Check your connection.');
+    return false;
+  }
+}
+
+// ========== অ্যাড আইটেম ==========
+function addItem() {
+  const name = document.getElementById('newItemName').value.trim();
+  const code = document.getElementById('newItemCode').value.trim().toUpperCase();
+  
+  if (!name) {
+    alert('Please enter item name');
+    return;
+  }
+  if (!code) {
+    alert('Please enter item code');
+    return;
+  }
+  if (items.find(i => i.code === code)) {
+    alert('Item code already exists!');
+    return;
+  }
+  
+  items.push({code, name});
+  saveToFirebase('items', items);
+  saveToFirebase(`stock/${code}`, 0);
+  
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemCode').value = '';
+  alert('✅ Item added successfully! Everyone can see it now.');
+}
+
+// ========== এডিট আইটেম ==========
+function editItem(index) {
+  const newCode = prompt('New Code:', items[index].code);
+  const newName = prompt('New Name:', items[index].name);
+  
+  if (!newCode || !newName) return;
+  if (newCode !== items[index].code && items.find(i => i.code === newCode)) {
+    alert('Code already exists!');
+    return;
+  }
+  
+  const oldCode = items[index].code;
+  const stock = stockData[oldCode] || 0;
+  
+  // পুরানো ডেটা রিমুভ
+  delete stockData[oldCode];
+  
+  // নতুন ডেটা সেট
+  items[index] = {code: newCode, name: newName};
+  stockData[newCode] = stock;
+  
+  saveToFirebase('items', items);
+  saveToFirebase('stock', stockData);
+  
+  alert('✅ Item updated successfully!');
+}
+
+// ========== ডিলিট আইটেম ==========
+function deleteItem(index) {
+  if (!confirm(`Delete "${items[index].name}" permanently? Everyone will lose access.`)) return;
+  
+  const code = items[index].code;
+  delete stockData[code];
+  items.splice(index, 1);
+  
+  saveToFirebase('items', items);
+  saveToFirebase('stock', stockData);
+  
+  alert('🗑️ Item deleted!');
+}
+
+// ========== স্টক চেঞ্জ ==========
+function changeStock(code, val) {
+  let n = Number(stockData[code] || 0);
+  n += val;
+  if (n < 0) n = 0;
+  stockData[code] = n;
+  saveToFirebase('stock', stockData);
+}
+
+// ========== বাল্ক অ্যাড ==========
+function bulkAdd() {
+  const code = bulkItemSelect.value;
+  const qty = Number(document.getElementById('bulkQty').value);
+  
+  if (!qty || qty <= 0) {
+    alert('Please enter a valid quantity');
+    return;
+  }
+  
+  let n = Number(stockData[code] || 0);
+  stockData[code] = n + qty;
+  saveToFirebase('stock', stockData);
+  
+  document.getElementById('bulkQty').value = '';
+  alert('✅ Stock added successfully!');
+}
+
+// ========== ইস্যু আইটেম ==========
+function issueItem(code) {
+  const qty = Number(document.getElementById(`issue_${code}`).value);
+  const name = document.getElementById(`name_${code}`).value.trim() || 'Unknown';
+  const stock = Number(stockData[code] || 0);
+  
+  if (!qty || qty <= 0) {
+    alert('Please enter a valid quantity');
+    return;
+  }
+  if (qty > stock) {
+    alert(`Insufficient stock! Available: ${stock}`);
+    return;
+  }
+  
+  const newStock = stock - qty;
+  stockData[code] = newStock;
+  
+  const item = items.find(i => i.code === code);
+  const issueEntry = {
+    date: new Date().toLocaleString('bn-BD'),
+    name: name,
+    item: item ? item.name : code,
+    qty: qty
+  };
+  
+  issues.push(issueEntry);
+  
+  saveToFirebase('stock', stockData);
+  saveToFirebase('issues', issues);
+  
+  document.getElementById(`issue_${code}`).value = '1';
+  document.getElementById(`name_${code}`).value = '';
+  alert('✅ Item issued successfully!');
+}
+
+// ========== ডিলিট ইস্যু ==========
+function deleteIssue(index) {
+  if (!confirm('Delete this issue record?')) return;
+  issues.splice(index, 1);
+  saveToFirebase('issues', issues);
+}
+
+// ========== অ্যাডমিন টগল ==========
+function toggleAdmin() {
+  if (adminPanel.style.display === 'block') {
+    adminPanel.style.display = 'none';
+  } else {
+    const pass = prompt('Enter Admin Password:');
+    if (pass === '7080') {
+      adminPanel.style.display = 'block';
+      renderAdmin();
+      renderIssueManager();
+    } else if (pass !== null) {
+      alert('❌ Wrong password!');
+    }
+  }
+}
+
+// ========== ডার্ক মোড ==========
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const btn = document.querySelector('.header-btn:last-child');
+  btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+}
+
+// ========== রিসেট অল ==========
+function resetAllData() {
+  if (!confirm('⚠️ Delete ALL data from server? Everyone will lose all data!')) return;
+  if (!confirm('Are you ABSOLUTELY sure?')) return;
+  if (!confirm('This cannot be undone! Type "RESET" to confirm.')) return;
+  
+  const confirmText = prompt('Type "RESET" to confirm:');
+  if (confirmText !== 'RESET') {
+    alert('Reset cancelled.');
+    return;
+  }
+  
+  items = DEFAULT_ITEMS;
+  stockData = {};
+  issues = [];
+  
+  saveToFirebase('items', items);
+  saveToFirebase('stock', stockData);
+  saveToFirebase('issues', issues);
+  
+  alert('🗑️ All data has been reset!');
+}
+
+// ========== কিবোর্ড শর্টকাট ==========
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && adminPanel.style.display === 'block') {
+    toggleAdmin();
+  }
+  if (e.ctrlKey && e.key === 'd') {
+    e.preventDefault();
+    toggleDarkMode();
+  }
+});
+
+console.log('⚡ AKIJ Electric Portal v3.0 (Live)');
+console.log('👨‍💻 Developed by Md Al-Amin');
+console.log('🌍 Everyone sees the same data!');
+console.log('📌 Shortcuts: Esc=Close Admin, Ctrl+D=Dark Mode');
+</script>
+
+</body>
+</html>
