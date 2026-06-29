@@ -45,7 +45,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.85);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -203,28 +203,43 @@ header h3 {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .header-btn {
   background: rgba(255,255,255,0.2);
   color: #fff;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: 10px;
   cursor: pointer;
   border: 2px solid rgba(255,255,255,0.3);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .header-btn:hover {
   background: rgba(255,255,255,0.3);
 }
 
-.online-status {
+.sync-status {
   font-size: 12px;
   padding: 4px 12px;
   border-radius: 20px;
   background: #4caf50;
   color: #fff;
+}
+
+.sync-status.syncing {
+  background: #ff9800;
+  animation: pulse 1s infinite;
+}
+
+.sync-status.error {
+  background: #ff4444;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* ========== WELCOME ========== */
@@ -240,6 +255,1136 @@ header h3 {
 .welcome h2 {
   font-size: 22px;
   margin-bottom: 8px;
+  color: var(--secondary);
+}
+
+.welcome h3 {
+  font-size: 18px;
+}
+
+/* ========== MENU ========== */
+.menu {
+  display: flex;
+  gap: 10px;
+  padding: 0 15px 15px;
+  flex-wrap: wrap;
+}
+
+.menu button {
+  flex: 1;
+  min-width: 100px;
+  background: var(--primary);
+  color: #fff;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: var(--radius);
+}
+
+.menu button:hover {
+  background: #1a2a4a;
+}
+
+.menu button.active {
+  background: var(--secondary);
+}
+
+/* ========== SECTION ========== */
+.section {
+  display: none;
+  padding: 0 15px 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+.section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: var(--primary);
+}
+
+/* ========== ITEM কার্ড ========== */
+.item {
+  background: var(--card);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--secondary);
+}
+
+.item b {
+  font-size: 16px;
+  color: var(--primary);
+}
+
+.item p {
+  margin: 8px 0;
+  font-weight: bold;
+}
+
+.item .input-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.item input {
+  flex: 1;
+  min-width: 80px;
+  padding: 8px;
+  margin: 0;
+}
+
+.item button {
+  background: var(--secondary);
+  color: #fff;
+  padding: 8px 16px;
+}
+
+.item button:hover {
+  background: #e06d00;
+}
+
+/* ========== CONTACT & ABOUT ========== */
+#contact p, #about p {
+  background: var(--card);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 5px 0;
+  box-shadow: var(--shadow);
+}
+
+/* ========== HISTORY ========== */
+#history .item {
+  border-left-color: #2196F3;
+}
+
+/* ========== ADMIN PANEL ========== */
+#adminPanel {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+#adminPanel > div {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #1a1a2e;
+  padding: 25px;
+  border-radius: var(--radius);
+}
+
+.close-btn {
+  background: #ff4444;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.close-btn:hover {
+  background: #cc0000;
+}
+
+.admin-section {
+  background: #2a2a4a;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: var(--radius);
+}
+
+.admin-section h3 {
+  color: var(--secondary);
+  margin-bottom: 10px;
+}
+
+.admin-section input, .admin-section select {
+  background: #1a1a2e;
+  color: #fff;
+  border-color: #444;
+}
+
+.admin-section button {
+  background: var(--secondary);
+  color: #fff;
+  padding: 8px 16px;
+  margin: 5px;
+}
+
+.admin-section button:hover {
+  background: #e06d00;
+}
+
+.admin-box {
+  background: #1a1a2e;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border-left: 3px solid var(--secondary);
+}
+
+.admin-box button {
+  background: #444;
+  color: #fff;
+  padding: 5px 12px;
+  margin: 3px;
+  font-size: 12px;
+}
+
+.admin-box button:hover {
+  background: #666;
+}
+
+.admin-box .delete-btn {
+  background: #ff4444;
+}
+
+.admin-box .delete-btn:hover {
+  background: #cc0000;
+}
+
+.admin-box .edit-btn {
+  background: #2196F3;
+}
+
+.admin-box .edit-btn:hover {
+  background: #1976D2;
+}
+
+/* ========== FOOTER ========== */
+footer {
+  text-align: center;
+  padding: 20px;
+  font-weight: bold;
+  background: var(--card);
+  margin-top: 20px;
+  border-top: 2px solid var(--secondary);
+  color: var(--text);
+}
+
+/* ========== রেসপনসিভ ========== */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .menu button {
+    min-width: 70px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .item .input-group {
+    flex-direction: column;
+  }
+  
+  .item input {
+    width: 100%;
+  }
+  
+  #adminPanel > div {
+    padding: 15px;
+  }
+  
+  .login-box {
+    padding: 20px;
+  }
+}
+
+/* ========== স্ক্রলবার ========== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e06d00;
+}
+
+/* ========== লাইভ ইন্ডিকেটর ========== */
+.live-badge {
+  background: #ff4444;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ========== লাস্ট আপডেটেড ========== */
+.last-updated {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  margin: 5px 0;
+}
+
+/* ========== নোটিফিকেশন ========== */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #333;
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  z-index: 99999;
+  animation: slideUp 0.5s ease;
+  max-width: 350px;
+}
+
+.toast.success {
+  background: #4caf50;
+}
+
+.toast.error {
+  background: #ff4444;
+}
+
+.toast.info {
+  background: #2196F3;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- ====== লোডিং ====== -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div id="loadingText">🔄 Connecting to server...</div>
+  <div style="font-size:14px;color:#aaa;">Please wait</div>
+</div>
+
+<!-- ====== LOGIN পেজ ====== -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <div class="logo">
+      <div class="logo-circle">⚡</div>
+    </div>
+    <h2>AKIJ Electric</h2>
+    <p style="text-align:center;color:#888;margin-bottom:15px;">Online Sync Inventory System</p>
+    
+    <input id="username" placeholder="Username" autofocus>
+    <input id="password" type="password" placeholder="Password" onkeypress="if(event.key==='Enter') login()">
+    
+    <button class="login-btn" onclick="login()">🔐 Login</button>
+    
+    <p style="text-align:center;margin-top:15px;font-size:12px;color:#888;">Default: akij / 7070</p>
+    <p style="text-align:center;font-size:11px;color:#666;">🌐 All users see the same data in real-time!</p>
+  </div>
+</div>
+
+<!-- ====== PORTAL ====== -->
+<div class="portal" id="portal">
+
+  <!-- HEADER -->
+  <header>
+    <div>
+      <h3>⚡ AKIJ Electric Portal <span class="live-badge">LIVE</span></h3>
+      <div id="timeDisplay">Loading...</div>
+    </div>
+    <div class="header-buttons">
+      <span class="sync-status" id="syncStatus">🟢 Synced</span>
+      <button class="header-btn" onclick="manualSync()">🔄 Sync</button>
+      <button class="header-btn" onclick="toggleAdmin()">👤 Admin</button>
+      <button class="header-btn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+  </header>
+
+  <!-- WELCOME -->
+  <div class="welcome">
+    <h2 id="slideText">Welcome To AKIJ Electric Portal</h2>
+    <h3>📦 Total Stock: <span id="totalStock">0</span></h3>
+    <div class="last-updated" id="lastUpdated">Last updated: Just now</div>
+  </div>
+
+  <!-- MENU -->
+  <div class="menu">
+    <button class="active" data-page="items" onclick="showPage('items')">📋 Items</button>
+    <button data-page="contact" onclick="showPage('contact')">📞 Emergency</button>
+    <button data-page="about" onclick="showPage('about')">ℹ️ About</button>
+    <button data-page="history" onclick="showPage('history')">📜 Issue History</button>
+  </div>
+
+  <!-- ====== ITEMS ====== -->
+  <div id="items" class="section active"></div>
+
+  <!-- ====== CONTACT ====== -->
+  <div id="contact" class="section">
+    <h3>📞 Emergency Contact</h3>
+    <p>👤 Name: Md Al-Amin</p>
+    <p>📱 Phone: 01859137381</p>
+    <p>📧 Email: alamin.garena3@gmail.com</p>
+    <p style="margin-top:15px;background:#fff3cd;padding:12px;border-radius:8px;border-left:4px solid #ffc107;">
+      ⚠️ For urgent technical support, please call during office hours.
+    </p>
+  </div>
+
+  <!-- ====== ABOUT ====== -->
+  <div id="about" class="section">
+    <h3>ℹ️ About</h3>
+    <p>🏢 AKIJ Electric Inventory Management System</p>
+    <p>📌 Version: 5.0 (Online Sync)</p>
+    <p>👨‍💻 Developer: Md Al-Amin</p>
+    <p>📅 Last Updated: January 2024</p>
+    <p style="margin-top:15px;">🌐 <b>Online synchronized system</b> - All users see the same data!</p>
+    <p style="margin-top:5px;color:#888;font-size:14px;">💾 Data stored in JSONBin.io cloud</p>
+  </div>
+
+  <!-- ====== HISTORY ====== -->
+  <div id="history" class="section">
+    <h3>📜 Issue History</h3>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ====== ADMIN PANEL ====== -->
+  <div id="adminPanel">
+    <div>
+      <button class="close-btn" onclick="toggleAdmin()">✖ Close Admin Panel</button>
+      
+      <h2 style="color:#ff7a00;margin-bottom:20px;">🔧 Admin Panel</h2>
+      
+      <!-- Add Item -->
+      <div class="admin-section">
+        <h3>➕ Add New Item</h3>
+        <input id="newItemName" placeholder="Item Name (e.g., Motor 24V)">
+        <input id="newItemCode" placeholder="Item Code (e.g., M003)" style="margin-top:8px;">
+        <button onclick="addItem()" style="margin-top:8px;">Add Item</button>
+      </div>
+      
+      <!-- Bulk Stock -->
+      <div class="admin-section">
+        <h3>📦 Bulk Stock Add</h3>
+        <select id="bulkItemSelect"></select>
+        <input id="bulkQty" type="number" placeholder="Quantity" style="margin-top:8px;">
+        <button onclick="bulkAdd()" style="margin-top:8px;">Add Stock</button>
+      </div>
+      
+      <!-- Stock Control -->
+      <div class="admin-section">
+        <h3>📊 Stock Control</h3>
+        <div id="adminList"></div>
+      </div>
+      
+      <!-- Issue Manager -->
+      <div class="admin-section">
+        <h3>🗑️ Issue Manager</h3>
+        <div id="issueManager"></div>
+      </div>
+      
+      <!-- Danger Zone -->
+      <div class="admin-section" style="border:2px solid #ff4444;">
+        <h3 style="color:#ff4444;">⚠️ Danger Zone</h3>
+        <button onclick="resetAllData()" style="background:#ff4444;">🗑️ Reset All Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>⚡ Developed by Md Al-Amin | AKIJ Electric © 2024 | 🌐 Online Sync</footer>
+</div>
+
+<!-- ====== JAVASCRIPT ====== -->
+<script>
+// ========================================
+// 📌 আপনার JSONBin.io তথ্য (আপনার দেওয়া)
+// ========================================
+const JSONBIN_CONFIG = {
+  binId: '6a427ce4f5f4af5e2941ec31',
+  apiKey: '$2a$10$3/w.SEXsFWe5J26TEE5xL0h5JBGIH4MZtUbN'
+};
+// ========================================
+
+// ========== DOM রেফারেন্স ==========
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loginPage = document.getElementById('loginPage');
+const portal = document.getElementById('portal');
+const username = document.getElementById('username');
+const password = document.getElementById('password');
+const timeDisplay = document.getElementById('timeDisplay');
+const slideText = document.getElementById('slideText');
+const totalStock = document.getElementById('totalStock');
+const itemsContainer = document.getElementById('items');
+const historyList = document.getElementById('historyList');
+const adminPanel = document.getElementById('adminPanel');
+const bulkItemSelect = document.getElementById('bulkItemSelect');
+const adminList = document.getElementById('adminList');
+const issueManager = document.getElementById('issueManager');
+const syncStatus = document.getElementById('syncStatus');
+const lastUpdated = document.getElementById('lastUpdated');
+
+// ========== ডিফল্ট ডেটা ==========
+const DEFAULT_ITEMS = [
+  {code: 'M001', name: 'Motor 6v'},
+  {code: 'M002', name: 'Motor 12v'},
+  {code: 'B001', name: 'Battery 6V'},
+  {code: 'BS16', name: 'Blade Stand 16'}
+];
+
+let items = [];
+let issues = [];
+let stockData = {};
+let syncInterval;
+
+// ========== টোস্ট নোটিফিকেশন ==========
+function showToast(message, type = 'info') {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.5s';
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
+}
+
+// ========== JSONBin.io ফাংশন ==========
+async function loadFromJSONBin() {
+  try {
+    setSyncStatus('syncing', '⏳ Loading...');
+    
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.binId}/latest`, {
+      headers: {
+        'X-Master-Key': JSONBIN_CONFIG.apiKey
+      }
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        // প্রথমবার Bin খালি, ডিফল্ট ডেটা সেট করি
+        items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        stockData = {};
+        issues = [];
+        await saveToJSONBin();
+        setSyncStatus('online', '🟢 Synced');
+        return true;
+      }
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    const record = data.record;
+    
+    if (record && record.items) {
+      items = record.items;
+      stockData = record.stock || {};
+      issues = record.issues || [];
+      setSyncStatus('online', '🟢 Synced');
+      return true;
+    } else {
+      items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      stockData = {};
+      issues = [];
+      await saveToJSONBin();
+      setSyncStatus('online', '🟢 Synced');
+      return true;
+    }
+  } catch (error) {
+    console.error('JSONBin load error:', error);
+    setSyncStatus('error', '🔴 Offline');
+    return loadFromLocalStorage();
+  }
+}
+
+async function saveToJSONBin() {
+  try {
+    setSyncStatus('syncing', '⏳ Saving...');
+    
+    const data = {
+      items: items,
+      stock: stockData,
+      issues: issues,
+      lastUpdated: new Date().toISOString()
+    };
+    
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_CONFIG.binId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_CONFIG.apiKey
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    setSyncStatus('online', '🟢 Synced');
+    updateLastUpdated();
+    saveToLocalStorage();
+    return true;
+  } catch (error) {
+    console.error('JSONBin save error:', error);
+    setSyncStatus('error', '🔴 Offline');
+    return saveToLocalStorage();
+  }
+}
+
+// ========== লোকাল স্টোরেজ (ব্যাকআপ) ==========
+function loadFromLocalStorage() {
+  try {
+    const storedItems = localStorage.getItem('akij_items');
+    if (storedItems) {
+      items = JSON.parse(storedItems);
+    } else {
+      items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      saveToLocalStorage();
+    }
+    
+    const storedStock = localStorage.getItem('akij_stock');
+    if (storedStock) {
+      stockData = JSON.parse(storedStock);
+    } else {
+      stockData = {};
+      saveToLocalStorage();
+    }
+    
+    const storedIssues = localStorage.getItem('akij_issues');
+    if (storedIssues) {
+      issues = JSON.parse(storedIssues);
+    } else {
+      issues = [];
+      saveToLocalStorage();
+    }
+    
+    setSyncStatus('offline', '💾 Local Only');
+    return true;
+  } catch (e) {
+    console.error('Local load error:', e);
+    return false;
+  }
+}
+
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem('akij_items', JSON.stringify(items));
+    localStorage.setItem('akij_stock', JSON.stringify(stockData));
+    localStorage.setItem('akij_issues', JSON.stringify(issues));
+    updateLastUpdated();
+    return true;
+  } catch (e) {
+    console.error('Local save error:', e);
+    return false;
+  }
+}
+
+// ========== সিঙ্ক স্ট্যাটাস ==========
+function setSyncStatus(status, text) {
+  if (syncStatus) {
+    syncStatus.textContent = text;
+    syncStatus.className = 'sync-status';
+    if (status === 'syncing') syncStatus.classList.add('syncing');
+    if (status === 'error') syncStatus.classList.add('error');
+    if (status === 'offline') syncStatus.style.background = '#ff9800';
+    if (status === 'online') syncStatus.style.background = '#4caf50';
+  }
+}
+
+// ========== ম্যানুয়াল সিঙ্ক ==========
+async function manualSync() {
+  showToast('🔄 Syncing data...', 'info');
+  const success = await loadFromJSONBin();
+  if (success) {
+    renderItems();
+    loadBulkSelect();
+    renderAdmin();
+    renderHistory();
+    renderIssueManager();
+    updateTotal();
+    showToast('✅ Data synced successfully!', 'success');
+  } else {
+    showToast('❌ Sync failed! Using local data.', 'error');
+  }
+}
+
+// ========== ডেটা লোড ==========
+async function loadAllData() {
+  loadingOverlay.style.display = 'flex';
+  document.getElementById('loadingText').textContent = '🔄 Loading data...';
+  
+  let success = await loadFromJSONBin();
+  
+  if (success) {
+    renderItems();
+    loadBulkSelect();
+    renderAdmin();
+    renderHistory();
+    renderIssueManager();
+    updateTotal();
+    updateLastUpdated();
+    showToast('✅ Data loaded successfully!', 'success');
+  } else {
+    showToast('⚠️ Using local data. Server may be offline.', 'error');
+  }
+  
+  loadingOverlay.style.display = 'none';
+}
+
+// ========== ডেটা সেভ ==========
+async function saveAllData(showMsg = true) {
+  const success = await saveToJSONBin();
+  if (success && showMsg) {
+    showToast('✅ Data saved successfully!', 'success');
+  } else if (!success && showMsg) {
+    showToast('⚠️ Saved locally. Server is offline.', 'error');
+  }
+  return success;
+}
+
+// ========== লাস্ট আপডেটেড ==========
+function updateLastUpdated() {
+  if (lastUpdated) {
+    const now = new Date().toLocaleString('bn-BD');
+    lastUpdated.textContent = `Last updated: ${now}`;
+  }
+}
+
+// ========== লগইন ==========
+function login() {
+  const user = username.value.trim();
+  const pass = password.value.trim();
+  
+  if (user === 'akij' && pass === '7070') {
+    loginPage.style.display = 'none';
+    portal.style.display = 'block';
+    loadAllData();
+    startClock();
+    startSlider();
+    
+    // প্রতি 60 সেকেন্ড পর ডেটা রিফ্রেশ
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(() => {
+      loadFromJSONBin().then(() => {
+        renderItems();
+        renderAdmin();
+        renderHistory();
+        renderIssueManager();
+        updateTotal();
+      });
+    }, 60000);
+  } else {
+    showToast('❌ Wrong username or password!', 'error');
+    password.value = '';
+    password.focus();
+  }
+}
+
+// ========== ঘড়ি ==========
+function startClock() {
+  const updateClock = () => {
+    timeDisplay.textContent = new Date().toLocaleString('bn-BD', { 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+  };
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
+// ========== স্লাইডার ==========
+const slides = [
+  '⚡ Welcome To AKIJ Electric Portal',
+  '🌐 Online Sync System',
+  '👨‍💻 Developed By Al-Amin',
+  '👥 Everyone sees the same data!'
+];
+let slideIndex = 0;
+
+function startSlider() {
+  slideText.textContent = slides[0];
+  setInterval(() => {
+    slideIndex = (slideIndex + 1) % slides.length;
+    slideText.textContent = slides[slideIndex];
+  }, 2500);
+}
+
+// ========== পেজ শো ==========
+function showPage(pageId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  
+  document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.menu button[data-page="${pageId}"]`)?.classList.add('active');
+}
+
+// ========== টোটাল আপডেট ==========
+function updateTotal() {
+  let total = 0;
+  if (items && items.length > 0) {
+    items.forEach(item => {
+      total += Number(stockData[item.code] || 0);
+    });
+  }
+  totalStock.textContent = total;
+}
+
+// ========== রেন্ডার আইটেম ==========
+function renderItems() {
+  if (!itemsContainer) return;
+  itemsContainer.innerHTML = '';
+  
+  if (!items || items.length === 0) {
+    itemsContainer.innerHTML = '<p style="text-align:center;padding:20px;color:#888;">No items found. Add from Admin panel.</p>';
+    return;
+  }
+  
+  items.forEach(item => {
+    const stock = Number(stockData[item.code] || 0);
+    
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.id = `item_${item.code}`;
+    div.innerHTML = `
+      <b>${item.code} | ${item.name}</b>
+      <p>📊 Stock: <span id="stock_${item.code}">${stock}</span></p>
+      <div class="input-group">
+        <input id="name_${item.code}" placeholder="Recipient Name" value="">
+        <input id="issue_${item.code}" type="number" placeholder="Qty" min="1" value="1">
+        <button onclick="issueItem('${item.code}')">📤 Issue</button>
+      </div>
+    `;
+    itemsContainer.appendChild(div);
+  });
+  
+  updateTotal();
+}
+
+// ========== রেন্ডার হিস্ট্রি ==========
+function renderHistory() {
+  if (!historyList) return;
+  historyList.innerHTML = '';
+  
+  if (!issues || issues.length === 0) {
+    historyList.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">No issues recorded yet.</p>';
+    return;
+  }
+  
+  const reversed = [...issues].reverse();
+  reversed.forEach(x => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.style.borderLeftColor = '#2196F3';
+    div.innerHTML = `
+      <div style="font-size:12px;color:#888;">${x.date}</div>
+      <b>👤 ${x.name}</b>
+      <p>${x.item} - Quantity: ${x.qty}</p>
+    `;
+    historyList.appendChild(div);
+  });
+}
+
+// ========== লোড বাল্ক সিলেক্ট ==========
+function loadBulkSelect() {
+  if (!bulkItemSelect) return;
+  bulkItemSelect.innerHTML = '';
+  if (items && items.length > 0) {
+    items.forEach(i => {
+      const opt = document.createElement('option');
+      opt.value = i.code;
+      opt.textContent = `${i.code} | ${i.name}`;
+      bulkItemSelect.appendChild(opt);
+    });
+  }
+}
+
+// ========== রেন্ডার অ্যাডমিন ==========
+function renderAdmin() {
+  if (!adminList) return;
+  adminList.innerHTML = '';
+  
+  if (!items || items.length === 0) {
+    adminList.innerHTML = '<p style="color:#888;">No items to show.</p>';
+    return;
+  }
+  
+  items.forEach((item, index) => {
+    const stock = Number(stockData[item.code] || 0);
+    
+    const div = document.createElement('div');
+    div.className = 'admin-box';
+    div.innerHTML = `
+      <b>${item.code} | ${item.name}</b><br>
+      📦 Stock: ${stock}
+      <div style="margin-top:8px;">
+        <button onclick="changeStock('${item.code}', 1)">➕ +1</button>
+        <button onclick="changeStock('${item.code}', -1)">➖ -1</button>
+        <button onclick="changeStock('${item.code}', 5)">➕ +5</button>
+        <button onclick="changeStock('${item.code}', 10)">➕ +10</button>
+        <button class="edit-btn" onclick="editItem(${index})">✏️ Edit</button>
+        <button class="delete-btn" onclick="deleteItem(${index})">🗑️ Delete</button>
+      </div>
+    `;
+    adminList.appendChild(div);
+  });
+}
+
+// ========== রেন্ডার ইস্যু ম্যানেজার ==========
+function renderIssueManager() {
+  if (!issueManager) return;
+  issueManager.innerHTML = '';
+  
+  if (!issues || issues.length === 0) {
+    issueManager.innerHTML = '<p style="color:#888;">No issues recorded.</p>';
+    return;
+  }
+  
+  const reversed = [...issues].reverse();
+  reversed.forEach((x, index) => {
+    const realIndex = issues.length - 1 - index;
+    const div = document.createElement('div');
+    div.className = 'admin-box';
+    div.innerHTML = `
+      <b>👤 ${x.name}</b><br>
+      ${x.item} - Qty: ${x.qty}<br>
+      <span style="font-size:12px;color:#888;">${x.date}</span>
+      <div style="margin-top:8px;">
+        <button class="delete-btn" onclick="deleteIssue(${realIndex})">🗑️ Delete</button>
+      </div>
+    `;
+    issueManager.appendChild(div);
+  });
+}
+
+// ========== অ্যাড আইটেম ==========
+async function addItem() {
+  const name = document.getElementById('newItemName').value.trim();
+  const code = document.getElementById('newItemCode').value.trim().toUpperCase();
+  
+  if (!name) {
+    showToast('Please enter item name', 'error');
+    return;
+  }
+  if (!code) {
+    showToast('Please enter item code', 'error');
+    return;
+  }
+  if (items.find(i => i.code === code)) {
+    showToast('Item code already exists!', 'error');
+    return;
+  }
+  
+  items.push({code, name});
+  stockData[code] = 0;
+  await saveAllData();
+  
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemCode').value = '';
+  showToast('✅ Item added successfully!', 'success');
+}
+
+// ========== এডিট আইটেম ==========
+async function editItem(index) {
+  const newCode = prompt('New Code:', items[index].code);
+  const newName = prompt('New Name:', items[index].name);
+  
+  if (!newCode || !newName) return;
+  if (newCode !== items[index].code && items.find(i => i.code === newCode)) {
+    showToast('Code already exists!', 'error');
+    return;
+  }
+  
+  const oldCode = items[index].code;
+  const stock = stockData[oldCode] || 0;
+  
+  delete stockData[oldCode];
+  items[index] = {code: newCode, name: newName};
+  stockData[newCode] = stock;
+  
+  await saveAllData();
+  showToast('✅ Item updated successfully!', 'success');
+}
+
+// ========== ডিলিট আইটেম ==========
+async function deleteItem(index) {
+  if (!confirm(`Delete "${items[index].name}" permanently? Everyone will lose access.`)) return;
+  
+  const code = items[index].code;
+  delete stockData[code];
+  items.splice(index, 1);
+  
+  await saveAllData();
+  showToast('🗑️ Item deleted!', 'success');
+}
+
+// ========== স্টক চেঞ্জ ==========
+async function changeStock(code, val) {
+  let n = Number(stockData[code] || 0);
+  n += val;
+  if (n < 0) n = 0;
+  stockData[code] = n;
+  await saveAllData();
+}
+
+// ========== বাল্ক অ্যাড ==========
+async function bulkAdd() {
+  const code = bulkItemSelect.value;
+  const qty = Number(document.getElementById('bulkQty').value);
+  
+  if (!qty || qty <= 0) {
+    showToast('Please enter a valid quantity', 'error');
+    return;
+  }
+  
+  let n = Number(stockData[code] || 0);
+  stockData[code] = n + qty;
+  await saveAllData();
+  
+  document.getElementById('bulkQty').value = '';
+  showToast('✅ Stock added successfully!', 'success');
+}
+
+// ========== ইস্যু আইটেম ==========
+async function issueItem(code) {
+  const qty = Number(document.getElementById(`issue_${code}`).value);
+  const name = document.getElementById(`name_${code}`).value.trim() || 'Unknown';
+  const stock = Number(stockData[code] || 0);
+  
+  if (!qty || qty <= 0) {
+    showToast('Please enter a valid quantity', 'error');
+    return;
+  }
+  if (qty > stock) {
+    showToast(`Insufficient stock! Available: ${stock}`, 'error');
+    return;
+  }
+  
+  const newStock = stock - qty;
+  stockData[code] = newStock;
+  
+  const item = items.find(i => i.code === code);
+  const issueEntry = {
+    date: new Date().toLocaleString('bn-BD'),
+    name: name,
+    item: item ? item.name : code,
+    qty: qty
+  };
+  
+  issues.push(issueEntry);
+  await saveAllData();
+  
+  document.getElementById(`issue_${code}`).value = '1';
+  document.getElementById(`name_${code}`).value = '';
+  showToast('✅ Item issued successfully!', 'success');
+}
+
+// ========== ডিলিট ইস্যু ==========
+async function deleteIssue(index) {
+  if (!confirm('Delete this issue record?')) return;
+  issues.splice(index, 1);
+  await saveAllData();
+}
+
+// ========== অ্যাডমিন টগল ==========
+function toggleAdmin() {
+  if (adminPanel.style.display === 'block') {
+    adminPanel.style.display = 'none';
+  } else {
+    const pass = prompt('Enter Admin Password:');
+    if (pass === '7080') {
+      adminPanel.style.display = 'block';
+      renderAdmin();
+      renderIssueManager();
+    } else if (pass !== null) {
+      showToast('❌ Wrong password!', 'error');
+    }
+  }
+}
+
+// ========== ডার্ক মোড ==========
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const btn = document.querySelector('.header-btn:last-child');
+  btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+}
+
+// ========== রিসেট অল ==========
+async function resetAllData() {
+  if (!confirm('⚠️ Delete ALL data from server? Everyone will lose all data!')) return;
+  if (!confirm('Are you ABSOLUTELY sure?')) return;
+  
+  const confirmText = prompt('Type "RESET" to confirm:');
+  if (confirmText !== 'RESET') {
+    showToast('Reset cancelled.', 'info');
+    return;
+  }
+  
+  items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+  stockData = {};
+  issues = [];
+  await saveAllData();
+  loadAllData();
+  showToast('🗑️ All data has been reset!', 'success');
+}
+
+// ========== কিবোর্ড শর্টকাট ==========
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && adminPanel.style.display === 'block') {
+    toggleAdmin();
+  }
+  if (e.ctrlKey && e.key === 'd') {
+    e.preventDefault();
+    toggleDarkMode();
+  }
+  if (e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    manualSync();
+  }
+});
+
+console.log('⚡ AKIJ Electric Portal v5.0 (Online Sync)');
+console.log('👨‍💻 Developed by Md Al-Amin');
+console.log('🌐 Using JSONBin.io for online sync');
+console.log('📌 Shortcuts: Esc=Close Admin, Ctrl+D=Dark Mode, Ctrl+S=Sync');
+console.log('📦 Bin ID:', JSONBIN_CONFIG.binId);
+</script>
+
+</body>
+</html>  margin-bottom: 8px;
   color: var(--secondary);
 }
 
