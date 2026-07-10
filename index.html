@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>AKIJ Electric - Hybrid</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            background: #f1f5f9;
+            min-height: 100vh;
+        }
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.92);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            color: #fff;
+            gap: 20px;
+        }
+        #loadingOverlay.show {
+            display: flex;
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            border-top: 4px solid #ff7a00;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #0f172a 0%, #1a2a4a 100%);
+            padding: 20px;
+        }
+        .login-box {
+            background: #fff;
+            padding: 40px 32px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            text-align: center;
+        }
+        .login-box h1 {
+            font-size: 28px;
+            color: #0f172a;
+        }
+        .login-box .sub {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 8px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            background: #f8fafc;
+        }
+        .login-box input:focus {
+            outline: none;
+            border-color: #ff7a00;
+        }
+        .login-box .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #ff7a00;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .login-box .login-btn:hover {
+            background: #e06d00;
+        }
+        .login-box .hint {
+            margin-top: 16px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .login-box .hint span {
+            background: #f1f5f9;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .sync-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .sync-badge.online {
+            background: #22c55e;
+            color: #fff;
+        }
+        .sync-badge.offline {
+            background: #f59e0b;
+            color: #fff;
+        }
+        .portal {
+            display: none;
+            min-height: 100vh;
+        }
+        .portal.active {
+            display: block;
+        }
+        header {
+            background: #0f172a;
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header .brand h2 {
+            font-size: 18px;
+        }
+        header .brand .badge {
+            background: #ef4444;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .header-actions .sync-status {
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            background: #22c55e;
+            color: #fff;
+        }
+        .header-actions .sync-status.offline {
+            background: #f59e0b;
+        }
+        .header-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .header-btn.scanner-btn {
+            background: #22c55e;
+            border-color: #22c55e;
+        }
+        .header-btn.scanner-btn:hover {
+            background: #16a34a;
+        }
+        .welcome {
+            background: #fff;
+            margin: 12px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .welcome h2 {
+            font-size: 18px;
+            color: #0f172a;
+        }
+        .welcome .sub {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .welcome .total {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ff7a00;
+        }
+        .welcome .label {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .last-updated {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 0 12px 12px;
+            flex-wrap: wrap;
+        }
+        .category-tabs button {
+            padding: 8px 20px;
+            border: 2px solid #e2e8f0;
+            background: #fff;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #64748b;
+            cursor: pointer;
+            flex: 1;
+            min-width: 100px;
+        }
+        .category-tabs button.active {
+            border-color: #ff7a00;
+            background: #ff7a00;
+            color: #fff;
+        }
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            padding: 0 12px 20px;
+        }
+        .item-card {
+            background: #fff;
+            padding: 16px 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid #ff7a00;
+        }
+        .item-card .code {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff7a00;
+            background: #fef3e2;
+            padding: 2px 12px;
+            border-radius: 30px;
+        }
+        .item-card .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .item-card .stock {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 6px 0 2px;
+        }
+        .item-card .stock span {
+            font-size: 14px;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+        .item-card .input-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .item-card .input-group input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            min-width: 60px;
+        }
+        .item-card .input-group .issue-btn {
+            padding: 8px 16px;
+            background: #ff7a00;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .item-card .input-group .issue-btn:hover {
+            background: #e06d00;
+        }
+        .item-card.category-fan {
+            border-left-color: #3b82f6;
+        }
+        .item-card.category-light {
+            border-left-color: #f59e0b;
+        }
+        .history-list {
+            padding: 0 12px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .history-item {
+            background: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #3b82f6;
+        }
+        .history-item .name {
+            font-weight: 600;
+        }
+        .history-item .detail {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .history-item .date {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .history-item .qty {
+            font-weight: 700;
+            color: #ff7a00;
+            font-size: 18px;
+        }
+        #adminPanel {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            padding: 20px;
+            overflow-y: auto;
+            color: #fff;
+        }
+        #adminPanel.open {
+            display: block;
+        }
+        #adminPanel .panel-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 16px;
+        }
+        #adminPanel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        #adminPanel .panel-header h2 {
+            color: #ff7a00;
+        }
+        #adminPanel .panel-header .close-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .admin-section {
+            background: #0f172a;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .admin-section h3 {
+            color: #ff7a00;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .admin-section input,
+        .admin-section select {
+            width: 100%;
+            padding: 10px 12px;
+            margin: 4px 0;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #fff;
+            font-size: 14px;
+        }
+        .admin-section .admin-btn {
+            padding: 8px 16px;
+            background: #ff7a00;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .admin-section .admin-btn.danger {
+            background: #ef4444;
+        }
+        .admin-item {
+            background: #0f172a;
+            padding: 10px 14px;
+            margin: 6px 0;
+            border-radius: 8px;
+            border-left: 3px solid #ff7a00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .admin-item .actions button {
+            padding: 3px 10px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .admin-item .actions .edit {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .admin-item .actions .delete {
+            background: #ef4444;
+            color: #fff;
+        }
+        .admin-item .actions .stock-btn {
+            background: #22c55e;
+            color: #fff;
+        }
+        .scanner-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 10001;
+            flex-direction: column;
+        }
+        .scanner-overlay.open {
+            display: flex;
+        }
+        .scanner-overlay video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .scanner-overlay .scan-controls {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            z-index: 10;
+        }
+        .scanner-overlay .scan-controls .capture-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #ff7a00;
+            cursor: pointer;
+        }
+        .scanner-overlay .scan-controls .capture-btn .inner {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: #ff7a00;
+            margin: 4px auto;
+        }
+        .scanner-overlay .scan-controls .close-scanner {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.8);
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .scanner-overlay .scan-status {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 6px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .preview-container {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.94);
+            z-index: 10002;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .preview-container.open {
+            display: flex;
+        }
+        .preview-container .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .preview-container .preview-header h3 {
+            color: #ff7a00;
+        }
+        .preview-container .preview-header .close-preview {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .preview-container img {
+            width: 100%;
+            max-height: 35vh;
+            object-fit: contain;
+            border-radius: 10px;
+            background: #000;
+        }
+        .preview-container .preview-info {
+            background: #1e293b;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin: 10px 0;
+            color: #fff;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .preview-container .preview-info .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 14px;
+        }
+        .preview-container .preview-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .preview-container .preview-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .preview-container .preview-buttons .confirm-btn {
+            background: #22c55e;
+            color: #fff;
+        }
+        .preview-container .preview-buttons .retake-btn {
+            background: #f59e0b;
+            color: #fff;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            z-index: 99999;
+            max-width: 350px;
+        }
+        .toast.success {
+            background: #22c55e;
+        }
+        .toast.error {
+            background: #ef4444;
+        }
+        .toast.info {
+            background: #3b82f6;
+        }
+        .toast.warning {
+            background: #f59e0b;
+        }
+        @media(max-width:640px) {
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+            .welcome {
+                flex-direction: column;
+                text-align: center;
+            }
+            .category-tabs button {
+                min-width: 70px;
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+            .header-actions .sync-status {
+                display: none;
+            }
+            .login-box {
+                padding: 28px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING -->
+    <div id="loadingOverlay" class="show">
+        <div class="spinner"></div>
+        <div id="loadingText">Connecting to server...</div>
+        <div id="loadingSub">Please wait</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="login-page" id="loginPage">
+        <div class="login-box">
+            <h1>⚡ AKIJ Electric</h1>
+            <p class="sub">Hybrid Inventory System</p>
+            <div id="loginSyncStatus" class="sync-badge offline">⏳ Checking...</div>
+            <input id="username" type="text" placeholder="Username" />
+            <input id="password" type="password" placeholder="Password" />
+            <button class="login-btn" onclick="handleLogin()">🔐 Login</button>
+            <p class="hint">Default: <span>akij / 7070</span></p>
+        </div>
+    </div>
+
+    <!-- PORTAL -->
+    <div class="portal" id="portal">
+        <header>
+            <div class="brand">
+                <h2>⚡ AKIJ <span class="badge">HYBRID</span></h2>
+            </div>
+            <div class="header-actions">
+                <span class="sync-status" id="syncStatus">● Synced</span>
+                <button class="header-btn scanner-btn" onclick="openScanner()">📸 Scan</button>
+                <button class="header-btn" onclick="manualSync()">🔄 Sync</button>
+                <button class="header-btn" onclick="toggleAdmin()">⚙️ Admin</button>
+            </div>
+        </header>
+
+        <div class="welcome">
+            <div>
+                <h2 id="slideText">Welcome to AKIJ Electric</h2>
+                <div class="sub" id="timeDisplay">Loading...</div>
+                <div id="dataSource" style="font-size:12px;color:#94a3b8;">📡 Source: Local</div>
+            </div>
+            <div>
+                <div class="total" id="totalStock">0</div>
+                <div class="label">Total Stock</div>
+                <div class="last-updated" id="lastUpdated">Just now</div>
+            </div>
+        </div>
+
+        <div class="category-tabs">
+            <button class="active" onclick="filterCategory('all')">📦 All</button>
+            <button onclick="filterCategory('fan')">🌀 Fan</button>
+            <button onclick="filterCategory('light')">💡 Light</button>
+        </div>
+
+        <div class="items-grid" id="itemsGrid"></div>
+
+        <div id="historySection">
+            <h3 style="padding:0 12px 10px;color:#0f172a;">📜 History</h3>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="adminPanel">
+        <div class="panel-container">
+            <div class="panel-header">
+                <h2>🔧 Admin</h2>
+                <button class="close-btn" onclick="toggleAdmin()">✖ Close</button>
+            </div>
+            <div class="admin-section">
+                <h3>➕ Add Item</h3>
+                <select id="newCategory"><option value="fan">🌀 Fan</option><option value="light">💡 Light</option></select>
+                <input id="newItemName" placeholder="Item Name" />
+                <input id="newItemCode" placeholder="Item Code" />
+                <button class="admin-btn" onclick="addItem()">Add</button>
+            </div>
+            <div class="admin-section">
+                <h3>📦 Bulk Stock</h3>
+                <select id="bulkItemSelect"></select>
+                <input id="bulkQty" type="number" placeholder="Qty" />
+                <button class="admin-btn" onclick="bulkAdd()">Add Stock</button>
+            </div>
+            <div class="admin-section"><h3>📊 Stock</h3><div id="adminList"></div></div>
+            <div class="admin-section"><h3>🗑️ Issues</h3><div id="issueManager"></div></div>
+            <div class="admin-section" style="border:2px solid #ef4444;">
+                <h3 style="color:#ef4444;">⚠️ Danger</h3>
+                <button class="admin-btn danger" onclick="resetAllData()">🗑️ Reset All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCANNER -->
+    <div class="scanner-overlay" id="scannerOverlay">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="scan-status" id="scanStatus">📸 Position document</div>
+        <div class="scan-controls">
+            <button class="close-scanner" onclick="closeScanner()">✖</button>
+            <button class="capture-btn" onclick="captureScan()"><div class="inner"></div></button>
+            <button class="close-scanner" onclick="toggleFlash()" style="font-size:20px;">💡</button>
+        </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-container" id="previewContainer">
+        <div class="preview-header">
+            <h3>📋 Review</h3>
+            <button class="close-preview" onclick="closePreview()">✖</button>
+        </div>
+        <img id="previewImage" src="" />
+        <div class="preview-info"><h4>📦 Items</h4><div id="previewItems"><p style="color:#94a3b8;">Processing...</p></div></div>
+        <div class="preview-buttons">
+            <button class="confirm-btn" onclick="confirmScanIssue()">✅ Issue All</button>
+            <button class="retake-btn" onclick="retakeScan()">🔄 Retake</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIG =====
+        const API_BASE_URL = 'https://akij-backend.onrender.com/api';
+        const DEFAULT_ITEMS = [
+            { code: 'CF001', name: 'Ceiling Fan', category: 'fan' },
+            { code: 'CF002', name: 'Wall Fan', category: 'fan' },
+            { code: 'CF003', name: 'Exhaust Fan', category: 'fan' },
+            { code: 'CF004', name: 'Fan Regulator', category: 'fan' },
+            { code: 'CL001', name: 'LED Bulb 9W', category: 'light' },
+            { code: 'CL002', name: 'LED Tube Light', category: 'light' },
+            { code: 'CL003', name: 'Panel Light', category: 'light' },
+            { code: 'CL004', name: 'Light Switch', category: 'light' },
+        ];
+
+        // ===== STATE =====
+        let items = [],
+            issues = [],
+            stockData = {};
+        let currentCategory = 'all';
+        let scannerStream = null,
+            extractedItems = [];
+        let isOnline = false,
+            dataSource = 'local';
+
+        // ===== DOM REFS =====
+        const $ = id => document.getElementById(id);
+        const loadingOverlay = $('loadingOverlay');
+        const loginPage = $('loginPage');
+        const portal = $('portal');
+        const syncStatus = $('syncStatus');
+        const dataSourceEl = $('dataSource');
+        const slideText = $('slideText');
+        const timeDisplay = $('timeDisplay');
+        const totalStock = $('totalStock');
+        const lastUpdated = $('lastUpdated');
+        const itemsGrid = $('itemsGrid');
+        const historyList = $('historyList');
+        const adminList = $('adminList');
+        const issueManager = $('issueManager');
+        const bulkItemSelect = $('bulkItemSelect');
+
+        // ===== TOAST =====
+        function showToast(msg, type = 'info') {
+            const old = document.querySelector('.toast');
+            if (old) old.remove();
+            const div = document.createElement('div');
+            div.className = `toast ${type}`;
+            div.textContent = msg;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3500);
+        }
+
+        // ===== LOADING =====
+        function showLoading(text, sub) {
+            $('loadingText').textContent = text || 'Loading...';
+            $('loadingSub').textContent = sub || 'Please wait';
+            loadingOverlay.classList.add('show');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.remove('show');
+        }
+
+        // ===== LOCAL STORAGE =====
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('akij_hybrid', JSON.stringify({ items, stock: stockData, issues }));
+            } catch (e) { console.warn('Save local failed'); }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const raw = localStorage.getItem('akij_hybrid');
+                if (raw) {
+                    const data = JSON.parse(raw);
+                    if (data.items) {
+                        items = data.items;
+                        stockData = data.stock || {};
+                        issues = data.issues || [];
+                        return true;
+                    }
+                }
+            } catch (e) { console.warn('Load local failed'); }
+            return false;
+        }
+
+        // ===== API =====
+        async function loadFromAPI() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/data`);
+                if (!res.ok) throw new Error('API failed');
+                const result = await res.json();
+                if (result.success && result.data) {
+                    items = result.data.items || [];
+                    stockData = result.data.stock || {};
+                    issues = result.data.issues || [];
+                    isOnline = true;
+                    dataSource = 'server';
+                    saveToLocalStorage();
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                isOnline = false;
+                return false;
+            }
+        }
+
+        async function saveToAPI() {
+            if (!isOnline) return false;
+            try {
+                const res = await fetch(`${API_BASE_URL}/data`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items, stock: stockData, issues })
+                });
+                const result = await res.json();
+                return result.success === true;
+            } catch (e) { return false; }
+        }
+
+        // ===== SYNC =====
+        async function loadData() {
+            const hasLocal = loadFromLocalStorage();
+
+            if (hasLocal) {
+                dataSource = 'local';
+                updateUI();
+                renderAll();
+                setSyncStatus('offline', '⚠️ Local');
+            }
+
+            const ok = await loadFromAPI();
+            if (ok) {
+                dataSource = 'server';
+                updateUI();
+                renderAll();
+                setSyncStatus('online', '● Synced');
+                showToast('✅ Synced with server', 'success');
+            } else if (!hasLocal) {
+                items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+                stockData = {};
+                issues = [];
+                saveToLocalStorage();
+                renderAll();
+                showToast('⚠️ Using default data', 'warning');
+            }
+            updateUI();
+            hideLoading();
+        }
+
+        async function saveData() {
+            saveToLocalStorage();
+            const ok = await saveToAPI();
+            if (ok) {
+                showToast('✅ Saved to server', 'success');
+                setSyncStatus('online', '● Synced');
+            } else {
+                showToast('💾 Saved locally', 'info');
+                setSyncStatus('offline', '⚠️ Local');
+            }
+            updateUI();
+        }
+
+        async function manualSync() {
+            showToast('🔄 Syncing...', 'info');
+            setSyncStatus('offline', '⏳ Syncing...');
+            await loadData();
+            updateUI();
+        }
+
+        // ===== UI HELPERS =====
+        function setSyncStatus(status, text) {
+            syncStatus.textContent = text;
+            syncStatus.className = 'sync-status';
+            if (status === 'offline') syncStatus.classList.add('offline');
+        }
+
+        function updateUI() {
+            if (dataSource === 'server') {
+                dataSourceEl.textContent = '📡 Source: Server';
+                dataSourceEl.style.color = '#22c55e';
+                $('loginSyncStatus').textContent = '🟢 Online';
+                $('loginSyncStatus').className = 'sync-badge online';
+            } else {
+                dataSourceEl.textContent = '💾 Source: Local';
+                dataSourceEl.style.color = '#f59e0b';
+                $('loginSyncStatus').textContent = '💾 Local';
+                $('loginSyncStatus').className = 'sync-badge offline';
+            }
+        }
+
+        // ===== RENDER =====
+        function renderAll() {
+            renderItems();
+            renderHistory();
+            renderAdmin();
+            loadBulkSelect();
+            updateTotal();
+            updateLastUpdated();
+        }
+
+        function renderItems() {
+            const filtered = currentCategory === 'all' ? items : items.filter(i => i.category === currentCategory);
+            if (filtered.length === 0) {
+                itemsGrid.innerHTML =
+                    '<p style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:30px 0;">No items</p>';
+                return;
+            }
+            itemsGrid.innerHTML = '';
+            filtered.forEach(item => {
+                const stock = Number(stockData[item.code] || 0);
+                const catClass = item.category === 'fan' ? 'category-fan' : 'category-light';
+                const card = document.createElement('div');
+                card.className = `item-card ${catClass}`;
+                card.innerHTML = `
+                    <div><span class="code">${item.code}</span> <span class="name">${item.name}</span></div>
+                    <div class="stock">${stock} <span>pcs</span></div>
+                    <div class="input-group">
+                        <input id="name_${item.code}" placeholder="Recipient" />
+                        <input id="issue_${item.code}" type="number" value="1" min="1" style="max-width:70px;" />
+                        <button class="issue-btn" onclick="issueItem('${item.code}')">Issue</button>
+                    </div>
+                `;
+                itemsGrid.appendChild(card);
+            });
+        }
+
+        function renderHistory() {
+            if (!issues || issues.length === 0) {
+                historyList.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:16px 0;">No history</p>';
+                return;
+            }
+            historyList.innerHTML = '';
+            [...issues].reverse().forEach(x => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div><div class="name">👤 ${x.name}</div><div class="detail">${x.item} × ${x.qty}</div><div class="date">${x.date}</div></div>
+                    <div class="qty">${x.qty}</div>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        function renderAdmin() {
+            adminList.innerHTML = '';
+            items.forEach((item, idx) => {
+                const stock = Number(stockData[item.code] || 0);
+                const div = document.createElement('div');
+                div.className = 'admin-item';
+                div.innerHTML = `
+                    <div><strong>${item.code}</strong> — ${item.name} <span style="color:#94a3b8;font-size:12px;">(${item.category})</span><br/>📦 ${stock} pcs</div>
+                    <div class="actions">
+                        <button class="stock-btn" onclick="changeStock('${item.code}',1)">+1</button>
+                        <button class="stock-btn" onclick="changeStock('${item.code}',-1)">-1</button>
+                        <button class="stock-btn" onclick="changeStock('${item.code}',5)">+5</button>
+                        <button class="stock-btn" onclick="changeStock('${item.code}',10)">+10</button>
+                        <button class="edit" onclick="editItem(${idx})">✏️</button>
+                        <button class="delete" onclick="deleteItem(${idx})">🗑️</button>
+                    </div>
+                `;
+                adminList.appendChild(div);
+            });
+
+            issueManager.innerHTML = '';
+            if (!issues || issues.length === 0) {
+                issueManager.innerHTML = '<p style="color:#94a3b8;">No issues</p>';
+                return;
+            }
+            [...issues].reverse().forEach((x, i) => {
+                const realIdx = issues.length - 1 - i;
+                const div = document.createElement('div');
+                div.className = 'admin-item';
+                div.innerHTML = `
+                    <div><strong>👤 ${x.name}</strong> — ${x.item} (${x.qty}) <span style="font-size:11px;color:#94a3b8;">${x.date}</span></div>
+                    <div class="actions"><button class="delete" onclick="deleteIssue(${realIdx})">🗑️</button></div>
+                `;
+                issueManager.appendChild(div);
+            });
+        }
+
+        function loadBulkSelect() {
+            bulkItemSelect.innerHTML = '';
+            items.forEach(i => {
+                const opt = document.createElement('option');
+                opt.value = i.code;
+                opt.textContent = `${i.code} — ${i.name}`;
+                bulkItemSelect.appendChild(opt);
+            });
+        }
+
+        function updateTotal() {
+            let total = 0;
+            items.forEach(i => { total += Number(stockData[i.code] || 0); });
+            totalStock.textContent = total;
+        }
+
+        function updateLastUpdated() {
+            lastUpdated.textContent = new Date().toLocaleString('bn-BD');
+        }
+
+        // ===== FILTER =====
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-tabs button').forEach(b => b.classList.toggle('active', b.textContent
+                .includes(cat === 'all' ? 'All' : cat === 'fan' ? 'Fan' : 'Light')));
+            renderItems();
+        }
+
+        // ===== LOGIN =====
+        async function handleLogin() {
+            if ($('username').value.trim() !== 'akij' || $('password').value.trim() !== '7070') {
+                showToast('❌ Invalid credentials', 'error');
+                return;
+            }
+            showLoading('Loading...', 'Please wait');
+            loginPage.style.display = 'none';
+            portal.classList.add('active');
+            await loadData();
+            startClock();
+            startSlider();
+            updateUI();
+
+            setInterval(() => { if (isOnline) loadFromAPI().then(() => { renderAll();
+                    updateUI(); }); }, 60000);
+            hideLoading();
+        }
+
+        // ===== CLOCK & SLIDER =====
+        function startClock() {
+            const update = () => {
+                timeDisplay.textContent = new Date().toLocaleString('bn-BD', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            };
+            update();
+            setInterval(update, 1000);
+        }
+
+        function startSlider() {
+            const msgs = ['⚡ Welcome to AKIJ', '📸 Scan & Issue', '🌐 Hybrid Sync'];
+            let i = 0;
+            slideText.textContent = msgs[0];
+            setInterval(() => {
+                i = (i + 1) % msgs.length;
+                slideText.textContent = msgs[i];
+            }, 3000);
+        }
+
+        // ===== ADMIN FUNCTIONS =====
+        async function addItem() {
+            const name = $('newItemName').value.trim();
+            const code = $('newItemCode').value.trim().toUpperCase();
+            const cat = $('newCategory').value;
+            if (!name || !code) { showToast('Fill all fields', 'error'); return; }
+            if (items.find(i => i.code === code)) { showToast('Code exists!', 'error'); return; }
+            items.push({ code, name, category: cat });
+            stockData[code] = 0;
+            await saveData();
+            renderAll();
+            $('newItemName').value = '';
+            $('newItemCode').value = '';
+            showToast('✅ Added', 'success');
+        }
+
+        async function editItem(idx) {
+            const nc = prompt('New Code:', items[idx].code);
+            const nn = prompt('New Name:', items[idx].name);
+            if (!nc || !nn) return;
+            if (nc !== items[idx].code && items.find(i => i.code === nc)) { showToast('Code exists!', 'error'); return; }
+            const old = items[idx].code;
+            const st = stockData[old] || 0;
+            delete stockData[old];
+            items[idx] = { ...items[idx], code: nc, name: nn };
+            stockData[nc] = st;
+            await saveData();
+            renderAll();
+            showToast('✅ Updated', 'success');
+        }
+
+        async function deleteItem(idx) {
+            if (!confirm('Delete?')) return;
+            const code = items[idx].code;
+            delete stockData[code];
+            items.splice(idx, 1);
+            await saveData();
+            renderAll();
+            showToast('🗑️ Deleted', 'success');
+        }
+
+        async function changeStock(code, val) {
+            let n = Number(stockData[code] || 0) + val;
+            if (n < 0) n = 0;
+            stockData[code] = n;
+            await saveData();
+            renderAll();
+        }
+
+        async function bulkAdd() {
+            const code = bulkItemSelect.value;
+            const qty = Number($('bulkQty').value);
+            if (!qty || qty <= 0) { showToast('Enter qty', 'error'); return; }
+            stockData[code] = (Number(stockData[code] || 0) + qty);
+            await saveData();
+            renderAll();
+            $('bulkQty').value = '';
+            showToast('✅ Stock added', 'success');
+        }
+
+        async function issueItem(code) {
+            const qty = Number($(`issue_${code}`).value);
+            const name = $(`name_${code}`).value.trim() || 'Unknown';
+            const stock = Number(stockData[code] || 0);
+            if (!qty || qty <= 0) { showToast('Enter qty', 'error'); return; }
+            if (qty > stock) { showToast(`Only ${stock} available`, 'error'); return; }
+            stockData[code] = stock - qty;
+            const item = items.find(i => i.code === code);
+            issues.push({ date: new Date().toLocaleString('bn-BD'), name, item: item ? item.name : code, qty });
+            await saveData();
+            renderAll();
+            $(`issue_${code}`).value = '1';
+            $(`name_${code}`).value = '';
+            showToast('✅ Issued', 'success');
+        }
+
+        async function deleteIssue(idx) {
+            if (!confirm('Delete?')) return;
+            issues.splice(idx, 1);
+            await saveData();
+            renderAll();
+        }
+
+        async function resetAllData() {
+            if (!confirm('Delete ALL?')) return;
+            if (prompt('Type RESET:') !== 'RESET') { showToast('Cancelled', 'info'); return; }
+            items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+            stockData = {};
+            issues = [];
+            localStorage.removeItem('akij_hybrid');
+            await saveData();
+            renderAll();
+            showToast('🗑️ Reset complete', 'success');
+        }
+
+        function toggleAdmin() {
+            $('adminPanel').classList.toggle('open');
+            if ($('adminPanel').classList.contains('open')) renderAdmin();
+        }
+
+        // ===== SCANNER =====
+        async function openScanner() {
+            $('scannerOverlay').classList.add('open');
+            $('scanStatus').textContent = '📸 Starting...';
+            try {
+                scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                $('scannerVideo').srcObject = scannerStream;
+                await $('scannerVideo').play();
+                $('scanStatus').textContent = '📸 Position & capture';
+            } catch (e) {
+                $('scanStatus').textContent = '❌ Camera denied';
+                showToast('❌ Camera permission required', 'error');
+            }
+        }
+
+        function closeScanner() {
+            if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop());
+                scannerStream = null; }
+            $('scannerOverlay').classList.remove('open');
+        }
+
+        function captureScan() {
+            const canvas = document.createElement('canvas');
+            canvas.width = $('scannerVideo').videoWidth || 1280;
+            canvas.height = $('scannerVideo').videoHeight || 720;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage($('scannerVideo'), 0, 0);
+            const imageData = canvas.toDataURL('image/jpeg', 0.9);
+            $('previewImage').src = imageData;
+            $('previewContainer').classList.add('open');
+            $('previewItems').innerHTML = '<p style="color:#f59e0b;">⏳ OCR...</p>';
+            runOCR(imageData);
+        }
+
+        async function runOCR(imageData) {
+            try {
+                const img = new Image();
+                img.src = imageData;
+                await new Promise(r => img.onload = r);
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                const result = await Tesseract.recognize(canvas, 'eng+ben');
+                extractedItems = parseOCRItems(result.data.text);
+                if (extractedItems.length === 0) {
+                    $('previewItems').innerHTML = '<p style="color:#f59e0b;">❌ No items found</p>';
+                    showToast('⚠️ No items', 'warning');
+                } else {
+                    $('previewItems').innerHTML = extractedItems.map((item, i) =>
+                        `<div class="item-row"><span>${i+1}. ${item.code}</span><span>${item.name}</span><span style="color:#ff7a00;">${item.qty}</span></div>`
+                    ).join('');
+                    showToast(`✅ ${extractedItems.length} items`, 'success');
+                }
+            } catch (e) {
+                $('previewItems').innerHTML = '<p style="color:#ef4444;">❌ OCR failed</p>';
+                showToast('❌ OCR failed', 'error');
+            }
+        }
+
+        function parseOCRItems(text) {
+            const lines = text.split('\n');
+            const result = [];
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.length < 3) continue;
+                const match = trimmed.match(/([A-Z0-9]{2,6})\s+([A-Za-z\s]+?)\s+(\d+)/);
+                if (match) {
+                    const code = match[1].trim(),
+                        name = match[2].trim(),
+                        qty = parseInt(match[3]);
+                    if (qty > 0 && qty < 9999 && code.length >= 2) {
+                        const existing = result.find(i => i.code === code);
+                        if (existing) existing.qty += qty;
+                        else {
+                            const systemItem = items.find(i => i.code === code);
+                            result.push({ code, name: systemItem ? systemItem.name : name || code, qty });
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        async function confirmScanIssue() {
+            if (extractedItems.length === 0) { showToast('❌ No items', 'error'); return; }
+            const recipient = prompt('👤 Recipient:');
+            if (!recipient) return;
+            for (const item of extractedItems) {
+                const stock = Number(stockData[item.code] || 0);
+                if (stock < item.qty) { showToast(`Not enough ${item.code}`, 'error'); return; }
+            }
+            for (const item of extractedItems) {
+                stockData[item.code] = Number(stockData[item.code] || 0) - item.qty;
+                issues.push({ date: new Date().toLocaleString('bn-BD'), name: recipient, item: item.name || item.code,
+                    qty: item.qty });
+            }
+            await saveData();
+            renderAll();
+            extractedItems = [];
+            $('previewContainer').classList.remove('open');
+            closeScanner();
+            showToast('✅ Issued!', 'success');
+        }
+
+        function retakeScan() {
+            $('previewContainer').classList.remove('open');
+            extractedItems = [];
+            openScanner();
+        }
+
+        function closePreview() {
+            $('previewContainer').classList.remove('open');
+            extractedItems = [];
+            closeScanner();
+        }
+
+        function toggleFlash() { showToast('💡 Flash', 'info'); }
+
+        // ===== KEYBOARD =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if ($('previewContainer').classList.contains('open')) closePreview();
+                else if ($('scannerOverlay').classList.contains('open')) closeScanner();
+                else if ($('adminPanel').classList.contains('open')) toggleAdmin();
+            }
+        });
+
+        // ===== NETWORK =====
+        window.addEventListener('online', () => { showToast('🌐 Online, syncing...', 'info');
+            manualSync(); });
+        window.addEventListener('offline', () => { showToast('📴 Offline mode', 'warning');
+            setSyncStatus('offline', '⚠️ Offline'); });
+
+        // ===== START =====
+        console.log('⚡ AKIJ Hybrid v8.0');
+        console.log('📦 API:', API_BASE_URL);
+        hideLoading();
+    </script>
+</body>
+</html>
